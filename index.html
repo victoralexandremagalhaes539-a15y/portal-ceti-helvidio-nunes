@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d3b">
+
+  <title>Portal CETI Helvídio Nunes</title>
+
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Biblioteca de ícones profissionais -->
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="login" class="login-screen">
+    <div class="login-card">
+      <img
+        src="./assets/logo-ceti.png"
+        alt="Brasão do CETI Helvídio Nunes"
+        class="login-logo"
+      >
+
+      <span class="eyebrow">PORTAL EDUCACIONAL</span>
+      <h1>CETI Helvídio Nunes</h1>
+      <p>Sua escola, mais conectada.</p>
+
+      <div class="login-divider"></div>
+
+      <button id="google-login" class="primary full">
+        Entrar com Google institucional
+      </button>
+
+      <p class="helper">
+        Utilize sua conta institucional autorizada.
+      </p>
+
+      <p id="login-message" role="status"></p>
+    </div>
+  </div>
+
+  <!-- APLICATIVO -->
+  <div id="app" class="app" hidden>
+
+    <!-- MENU LATERAL -->
+    <aside id="sidebar" class="sidebar">
+
+      <div class="brand">
+        <img
+          src="./assets/logo-ceti.png"
+          alt="Brasão da escola"
+        >
+
+        <div>
+          <strong>CETI Helvídio Nunes</strong>
+          <small>Portal Escolar</small>
+        </div>
+      </div>
+
+      <div class="sidebar-label">
+        MENU PRINCIPAL
+      </div>
+
+      <nav id="navigation"></nav>
+
+      <div class="sidebar-footer">
+        <button id="logout" class="logout">
+          <i data-lucide="log-out"></i>
+          Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <div class="workspace">
+
+      <header class="topbar">
+
+        <div class="topbar-left">
+
+          <button
+            id="menu-toggle"
+            class="icon-button"
+            aria-label="Abrir menu"
+          >
+            <i data-lucide="menu"></i>
+          </button>
+
+          <div>
+            <span class="eyebrow">PORTAL ESCOLAR</span>
+            <h2 id="page-title">Início</h2>
+          </div>
+
+        </div>
+
+        <div class="topbar-right">
+
+          <!-- NOTIFICAÇÕES -->
+          <button
+            id="notification-button"
+            class="icon-button"
+            aria-label="Notificações"
+          >
+            <i data-lucide="bell"></i>
+            <span id="notification-count"></span>
+          </button>
+
+          <!-- PERFIL -->
+          <button
+            id="profile-button"
+            class="profile-button"
+          >
+            <img id="header-avatar" alt="Foto de perfil">
+            <span id="header-name"></span>
+          </button>
+
+        </div>
+
+      </header>
+
+      <main id="content" aria-live="polite"></main>
+
+      <footer class="footer">
+        Portal CETI Helvídio Nunes • Comunidade escolar
+      </footer>
+
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+
+</body>
+</html>
+
