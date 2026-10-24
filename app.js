@@ -673,68 +673,6 @@ async clima() {
 
   await loadWeather(savedCity);
 },
-
-    );
-
-    url.search = new URLSearchParams({
-      latitude: WEATHER.latitude,
-      longitude: WEATHER.longitude,
-      current:
-        "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
-      daily:
-        "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-      timezone: "America/Fortaleza",
-      forecast_days: "7"
-    });
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error("Previsão indisponível.");
-    }
-
-    const data = await response.json();
-    const current = data.current;
-    const daily = data.daily;
-
-    $("content").innerHTML = `
-      <section class="hero">
-        <span class="eyebrow">METEOROLOGIA</span>
-        <h2>${current.temperature_2m} °C</h2>
-        <p>${escapeHTML(WEATHER.label)}</p>
-
-        <p>
-          Umidade: ${current.relative_humidity_2m}% •
-          Vento: ${current.wind_speed_10m} km/h
-        </p>
-      </section>
-
-      ${card(
-        "Previsão para os próximos 7 dias",
-        daily.time.map((day, i) => `
-          <div class="item row">
-            <strong>${dateBR(day)}</strong>
-
-            <span>
-              ${daily.temperature_2m_min[i]}° /
-              ${daily.temperature_2m_max[i]}°
-            </span>
-
-            <span>
-              Chuva:
-              ${daily.precipitation_probability_max[i] ?? "—"}%
-            </span>
-          </div>
-        `).join("")
-      )}
-
-      <p class="muted">
-        Dados: Open-Meteo. Previsões são estimativas
-        e podem sofrer alterações.
-      </p>
-    `;
-  },
-
   async ouvidoria() {
     const data = await query("complaints");
     let html = "";
