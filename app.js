@@ -514,165 +514,70 @@ const screens = {
     bindEditor("meals");
   },
 
-  
-async clima() {
-  const content = $("content");
-  const savedCity =
-    localStorage.getItem("ceti-weather-city") ||
-    "Paes Landim, Piauí";
+  async clima() {
+    const url = new URL(
+      "https://api.open-meteo.com/v1/forecast"
+    );
 
-  content.innerHTML = `
-    <section class="card">
-      <span class="eyebrow">CLIMA EM TEMPO REAL</span>
-      <h3>Consultar outra cidade</h3>
-      <form id="weather-form">
-        <label for="weather-city">Cidade e estado</label>
-        <input
-          id="weather-city"
-          name="city"
-          value="${escapeHTML(savedCity)}"
-          placeholder="Ex.: Paes Landim, Piauí"
-          required
-        >
-        <button class="primary" type="submit">
-          Consultar clima
-        </button>
-      </form>
-      <p id="weather-status" class="muted" role="status">
-        Buscando previsão...
-      </p>
-    </section>
-    <div id="weather-results"></div>
-  `;
+    url.search = new URLSearchParams({
+      latitude: WEATHER.latitude,
+      longitude: WEATHER.longitude,
+      current:
+        "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
+      daily:
+        "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+      timezone: "America/Fortaleza",
+      forecast_days: "7"
+    });
 
-  const form = $("weather-form");
-  const status = $("weather-status");
-  const results = $("weather-results");
+    const response = await fetch(url);
 
-  async function loadWeather(city) {
-    status.textContent = "Buscando a cidade e o clima...";
-    results.innerHTML = "";
-
-    try {
-      const geoUrl = new URL(
-        "https://geocoding-api.open-meteo.com/v1/search"
-      );
-
-      geoUrl.search = new URLSearchParams({
-        name: city,
-        count: "10",
-        language: "pt",
-        countryCode: "BR"
-      });
-
-      const geoResponse = await fetch(geoUrl);
-
-      if (!geoResponse.ok) {
-        throw new Error("Não foi possível pesquisar a cidade.");
-      }
-
-      const geoData = await geoResponse.json();
-      const places = geoData.results || [];
-
-      if (!places.length) {
-        throw new Error(
-          "Cidade não encontrada. Tente escrever cidade e estado."
-        );
-      }
-
-      // Prioriza uma correspondência com o nome digitado.
-      const normalized = value =>
-        value.normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toLowerCase().trim();
-
-      const exact = places.find(place =>
-        normalized(place.name) === normalized(city.split(",")[0].trim())
-      );
-
-      const place = exact || places[0];
-      const locationName =
-        `${place.name}, ${place.admin1 || "Brasil"}`;
-
-      status.textContent = `Consultando ${locationName}...`;
-
-      const weatherUrl = new URL(
-        "https://api.open-meteo.com/v1/forecast"
-      );
-
-      weatherUrl.search = new URLSearchParams({
-        latitude: String(place.latitude),
-        longitude: String(place.longitude),
-        current:
-          "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
-        daily:
-          "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-        timezone: "auto",
-        forecast_days: "7"
-      });
-
-      const weatherResponse = await fetch(weatherUrl);
-
-      if (!weatherResponse.ok) {
-        throw new Error("Não foi possível carregar a previsão.");
-      }
-
-      const data = await weatherResponse.json();
-      const current = data.current;
-      const daily = data.daily;
-
-      localStorage.setItem("ceti-weather-city", locationName);
-      $("weather-city").value = locationName;
-
-      results.innerHTML = `
-        <section class="hero">
-          <span class="eyebrow">TEMPO AGORA</span>
-          <h2>${current.temperature_2m} °C</h2>
-          <p>${escapeHTML(locationName)}</p>
-          <p>
-            Umidade: ${current.relative_humidity_2m}%<br>
-            Vento: ${current.wind_speed_10m} km/h<br>
-            Precipitação: ${current.precipitation} mm
-          </p>
-        </section>
-
-        ${card(
-          "Previsão para os próximos 7 dias",
-          daily.time.map((day, i) => `
-            <div class="item row">
-              <strong>${dateBR(day)}</strong>
-              <span>
-                ${daily.temperature_2m_min[i]}° /
-                ${daily.temperature_2m_max[i]}°
-              </span>
-              <span>
-                Chuva: ${daily.precipitation_probability_max[i] ?? "—"}%
-              </span>
-            </div>
-          `).join("")
-        )}
-
-        <p class="muted">
-          Dados meteorológicos: Open-Meteo.
-          A previsão pode mudar.
-        </p>
-      `;
-
-      status.textContent = `Clima atualizado: ${locationName}.`;
-    } catch (error) {
-      status.textContent =
-        error.message || "Erro ao carregar o clima.";
+    if (!response.ok) {
+      throw new Error("Previsão indisponível.");
     }
-  }
 
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-    const city = $("weather-city").value.trim();
-    if (city) await loadWeather(city);
-  });
+    const data = await response.json();
+    const current = data.current;
+    const daily = data.daily;
 
-  await loadWeather(savedCity);
-},
+    $("content").innerHTML = `
+      <section class="hero">
+        <span class="eyebrow">METEOROLOGIA</span>
+        <h2>${current.temperature_2m} °C</h2>
+        <p>${escapeHTML(WEATHER.label)}</p>
+
+        <p>
+          Umidade: ${current.relative_humidity_2m}% •
+          Vento: ${current.wind_speed_10m} km/h
+        </p>
+      </section>
+
+      ${card(
+        "Previsão para os próximos 7 dias",
+        daily.time.map((day, i) => `
+          <div class="item row">
+            <strong>${dateBR(day)}</strong>
+
+            <span>
+              ${daily.temperature_2m_min[i]}° /
+              ${daily.temperature_2m_max[i]}°
+            </span>
+
+            <span>
+              Chuva:
+              ${daily.precipitation_probability_max[i] ?? "—"}%
+            </span>
+          </div>
+        `).join("")
+      )}
+
+      <p class="muted">
+        Dados: Open-Meteo. Previsões são estimativas
+        e podem sofrer alterações.
+      </p>
+    `;
+  },
+
   async ouvidoria() {
     const data = await query("complaints");
     let html = "";
