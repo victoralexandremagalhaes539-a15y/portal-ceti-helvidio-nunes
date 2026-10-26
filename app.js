@@ -379,39 +379,64 @@ const screens = {
       </section>
 
       <div class="grid">
-        ${card(
-          `<span class="card-heading">
-            ${icon("megaphone", 22)}
-            Comunicados
-          </span>`,
-          "Acompanhe os avisos publicados pela escola."
-        )}
+        <section
+          class="card home-card"
+          data-page="avisos"
+          role="link"
+          tabindex="0"
+        >
+          <h3>${icon("megaphone", 22)} Comunicados</h3>
+          <p>Acompanhe os avisos publicados pela escola.</p>
+          <span class="muted">Abrir página →</span>
+        </section>
 
-        ${card(
-          `<span class="card-heading">
-            ${icon("calendar-days", 22)}
-            Calendário
-          </span>`,
-          "Veja eventos e datas importantes."
-        )}
+        <section
+          class="card home-card"
+          data-page="calendario"
+          role="link"
+          tabindex="0"
+        >
+          <h3>${icon("calendar-days", 22)} Calendário</h3>
+          <p>Veja eventos e datas importantes.</p>
+          <span class="muted">Abrir página →</span>
+        </section>
 
-        ${card(
-          `<span class="card-heading">
-            ${icon("utensils", 22)}
-            Alimentação
-          </span>`,
-          "Confira o cardápio escolar."
-        )}
+        <section
+          class="card home-card"
+          data-page="merenda"
+          role="link"
+          tabindex="0"
+        >
+          <h3>${icon("utensils", 22)} Alimentação</h3>
+          <p>Confira o cardápio escolar.</p>
+          <span class="muted">Abrir página →</span>
+        </section>
 
-        ${card(
-          `<span class="card-heading">
-            ${icon("message-square-text", 22)}
-            Ouvidoria
-          </span>`,
-          "Envie solicitações e acompanhe respostas."
-        )}
+        <section
+          class="card home-card"
+          data-page="ouvidoria"
+          role="link"
+          tabindex="0"
+        >
+          <h3>${icon("message-square-text", 22)} Ouvidoria</h3>
+          <p>Envie reclamações, elogios e sugestões.</p>
+          <span class="muted">Abrir página →</span>
+        </section>
       </div>
     `;
+
+    document.querySelectorAll(".home-card").forEach(item => {
+      const abrir = () => navigate(item.dataset.page);
+
+      item.addEventListener("click", abrir);
+
+      item.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          abrir();
+        }
+      });
+    });
   },
 
   async avisos() {
